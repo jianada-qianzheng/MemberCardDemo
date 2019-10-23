@@ -30,7 +30,10 @@ public class LocationService extends Service {
     private static final int LOCATION_INTERVAL = 60000;
     private static final float LOCATION_DISTANCE = 10f;
 
-    Location mLastLocation;
+    Double latitude ;
+    Double longitude;
+
+/*    Location mLastLocation;
 
 
     private class LocationListener implements android.location.LocationListener {
@@ -38,7 +41,10 @@ public class LocationService extends Service {
 
         public LocationListener(String provider) {
             Log.e(TAG, "LocationListener " + provider);
-            mLastLocation = new Location(provider);
+
+            if(mLastLocation==null) {
+                mLastLocation = new Location(provider);
+            }
         }
 
         @Override
@@ -61,8 +67,10 @@ public class LocationService extends Service {
         public void onStatusChanged(String provider, int status, Bundle extras) {
             Log.e(TAG, "onStatusChanged: " + provider);
         }
-    }
 
+
+    }
+*/
     /*
     LocationListener[] mLocationListeners = new LocationListener[]{
             new LocationListener(LocationManager.GPS_PROVIDER),
@@ -70,9 +78,9 @@ public class LocationService extends Service {
     };
     */
 
-    LocationListener[] mLocationListeners = new LocationListener[]{
-            new LocationListener(LocationManager.PASSIVE_PROVIDER)
-    };
+//    LocationListener[] mLocationListeners = new LocationListener[]{
+//            new LocationListener(LocationManager.PASSIVE_PROVIDER)
+//    };
 
 
 
@@ -108,12 +116,12 @@ public class LocationService extends Service {
                     ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                             PackageManager.PERMISSION_GRANTED) {
 
-                mLocationManager.requestLocationUpdates(
-                        LocationManager.PASSIVE_PROVIDER,
-                        LOCATION_INTERVAL,
-                        LOCATION_DISTANCE,
-                        mLocationListeners[0]
-                );
+//                mLocationManager.requestLocationUpdates(
+//                        LocationManager.PASSIVE_PROVIDER,
+//                        LOCATION_INTERVAL,
+//                        LOCATION_DISTANCE,
+//                        mLocationListeners[0]
+//                );
             } else {
                 //Toast.makeText(this, R.string.error_permission_map, Toast.LENGTH_LONG).show();
             }
@@ -136,7 +144,7 @@ public class LocationService extends Service {
 //                Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 //        registerReceiver(homePressReceiver, homeFilter);
 
-
+        getLocation();
 
 
     }
@@ -165,18 +173,18 @@ public class LocationService extends Service {
         }
 
 
-        if (mLocationManager != null) {
-            for (int i = 0; i < mLocationListeners.length; i++) {
-                try {
-                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                        return;
-                    }
-                    mLocationManager.removeUpdates(mLocationListeners[i]);
-                } catch (Exception ex) {
-                    Log.i(TAG, "fail to remove location listener, ignore", ex);
-                }
-            }
-        }
+//        if (mLocationManager != null) {
+//            for (int i = 0; i < mLocationListeners.length; i++) {
+//                try {
+//                    if (ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+//                        return;
+//                    }
+//                    mLocationManager.removeUpdates(mLocationListeners[i]);
+//                } catch (Exception ex) {
+//                    Log.i(TAG, "fail to remove location listener, ignore", ex);
+//                }
+//            }
+//        }
     }
 
 //    private Notification buildForegroundNotification() {
@@ -202,7 +210,7 @@ public class LocationService extends Service {
 
         return super.onStartCommand(intent, flags, startId);
     }
-//    //home键
+    //    //home键
 //    private final BroadcastReceiver homePressReceiver = new BroadcastReceiver() {
 //        final String SYSTEM_DIALOG_REASON_KEY = "reason";
 //        final String SYSTEM_DIALOG_REASON_HOME_KEY = "homekey";
@@ -228,15 +236,15 @@ public class LocationService extends Service {
         public void onReceive(final Context context, final Intent intent) {
             final String action = intent.getAction();
             if(Intent.ACTION_SCREEN_OFF.equals(action)) {
-                Log.e("location", mLastLocation.toString());
-
+                //Log.e("location", mLastLocation.toString());
+                Log.e("location",longitude+"/"+latitude);
                 //Notification(context, mLastLocation.toString());
 
                 CustomNotification(context,"2");
 
 
             }else if (Intent.ACTION_SCREEN_ON.equals(action)) {
-                Log.e("location", mLastLocation.toString());
+                //Log.e("location", mLastLocation.toString());
 
                 //Notification(context, mLastLocation.toString());
 
@@ -246,75 +254,75 @@ public class LocationService extends Service {
             }
         }
 
-    public void CustomNotification(Context mContext,String message) {
-        // Using RemoteViews to bind custom layouts into Notification
-        RemoteViews remoteViews = new RemoteViews(getPackageName(),
-                R.layout.custom_push);
+        public void CustomNotification(Context mContext,String message) {
+            // Using RemoteViews to bind custom layouts into Notification
+            RemoteViews remoteViews = new RemoteViews(getPackageName(),
+                    R.layout.custom_push);
 
-        // Set Notification Title
-        String strtitle = "title";
-        // Set Notification Text
-        String strtext = "text";
+            // Set Notification Title
+            String strtitle = "title";
+            // Set Notification Text
+            String strtext = "text";
 
-        // Open NotificationView Class on Notification Click
-        Intent intent = new Intent(mContext.getApplicationContext(), MainActivity.class);
-        // Send data to NotificationView Class
-        intent.putExtra("title", strtitle);
-        intent.putExtra("text", strtext);
-        // Open NotificationView.java Activity
-        PendingIntent pIntent = PendingIntent.getActivity(mContext.getApplicationContext(), 0, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT);
+            // Open NotificationView Class on Notification Click
+            Intent intent = new Intent(mContext.getApplicationContext(), MainActivity.class);
+            // Send data to NotificationView Class
+            intent.putExtra("title", strtitle);
+            intent.putExtra("text", strtext);
+            // Open NotificationView.java Activity
+            PendingIntent pIntent = PendingIntent.getActivity(mContext.getApplicationContext(), 0, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT);
 
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext.getApplicationContext(),"notify_001")
-                // Set Icon
-                .setSmallIcon(R.drawable.ic_launcher_background)
-                // Set Ticker Message
-                // Dismiss Notification
-                .setAutoCancel(true)
-                // Set PendingIntent into Notification
-                .setContentIntent(pIntent)
-                // Set RemoteViews into Notification
-                .setContent(remoteViews);
+            NotificationCompat.Builder builder = new NotificationCompat.Builder(mContext.getApplicationContext(),"notify_001")
+                    // Set Icon
+                    .setSmallIcon(R.drawable.ic_launcher_background)
+                    // Set Ticker Message
+                    // Dismiss Notification
+                    .setAutoCancel(true)
+                    // Set PendingIntent into Notification
+                    .setContentIntent(pIntent)
+                    // Set RemoteViews into Notification
+                    .setContent(remoteViews);
 
-        // Locate and set the Image into customnotificationtext.xml ImageViews
-        remoteViews.setImageViewResource(R.id.imagenotileft,R.drawable.common_google_signin_btn_icon_dark_normal);
-        remoteViews.setImageViewResource(R.id.imagenotiright,R.drawable.common_full_open_on_phone);
+            // Locate and set the Image into customnotificationtext.xml ImageViews
+            remoteViews.setImageViewResource(R.id.imagenotileft,R.drawable.common_google_signin_btn_icon_dark_normal);
+            remoteViews.setImageViewResource(R.id.imagenotiright,R.drawable.common_full_open_on_phone);
 
-        // Locate and set the Text into customnotificationtext.xml TextViews
-        remoteViews.setTextViewText(R.id.title,"text1");
-        remoteViews.setTextViewText(R.id.text,"text2");
+            // Locate and set the Text into customnotificationtext.xml TextViews
+            remoteViews.setTextViewText(R.id.title,"text1");
+            remoteViews.setTextViewText(R.id.text,"text2");
 
-        remoteViews.setTextViewText(R.id.textView,mLastLocation.toString());
+            remoteViews.setTextViewText(R.id.textView,longitude+"/"+latitude);
 
-        Bitmap bitm=null;
-        Ecoad ecc=new Ecoad(120, 40);
-        try {
-            bitm=ecc.bitmap1("012345");
-        } catch (Exception e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+            Bitmap bitm=null;
+            Ecoad ecc=new Ecoad(120, 40);
+            try {
+                bitm=ecc.bitmap1("012345");
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+
+            remoteViews.setImageViewBitmap(R.id.imagenotileft,bitm);
+
+
+
+
+
+            // Create Notification Manager
+            NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                NotificationChannel channel = new NotificationChannel("notify_001",
+                        "Channel human readable title",
+                        NotificationManager.IMPORTANCE_DEFAULT);
+                channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
+                notificationmanager.createNotificationChannel(channel);
+            }
+            // Build Notification with Notification Manager
+            notificationmanager.notify(0, builder.build());
+
         }
-
-        remoteViews.setImageViewBitmap(R.id.imagenotileft,bitm);
-
-
-
-
-
-        // Create Notification Manager
-        NotificationManager notificationmanager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel("notify_001",
-                    "Channel human readable title",
-                    NotificationManager.IMPORTANCE_DEFAULT);
-            channel.setLockscreenVisibility(Notification.VISIBILITY_PUBLIC);
-            notificationmanager.createNotificationChannel(channel);
-        }
-        // Build Notification with Notification Manager
-        notificationmanager.notify(0, builder.build());
-
-    }
 
         public void Notification(Context mContext, String message) {
             // Set Notification Title
@@ -327,7 +335,7 @@ public class LocationService extends Service {
             Bitmap bitm=null;
             Ecoad ecc=new Ecoad(120, 40);
             try {
-                 bitm=ecc.bitmap1("012345");
+                bitm=ecc.bitmap1("012345");
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -437,7 +445,25 @@ public class LocationService extends Service {
         }
     }
 
+    private void getLocation() {
+        GPSTracker gps = new GPSTracker(this);
+        if (gps.canGetLocation()) {
 
+            latitude = gps.getLatitude();
+            longitude = gps.getLongitude();
+            Log.d("lat", "" + latitude);
+            Log.d("long", "" + longitude);
+
+
+        } else {
+            // can't get location
+            // GPS or Network is not enabled
+            // Ask user to enable GPS/network in settings
+            gps.showSettingsAlert();
+        }
+
+
+    }
 
 }
 
